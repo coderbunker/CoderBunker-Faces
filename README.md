@@ -19,4 +19,4 @@ If you want to talk to me you can find me at CoderBunker most of the day.
 
 Alternatively you can contact me here:
 - email: jpbeltrami@gmail.com
-- wechat: ![My QR](https://jpbimages.sh1a.qingstor.com/wechatQR.jpeg?expires=1492848801&signature=DTI2HkBSMbttkA2ip%2FbcEKEzysptTNXcX8EIPswBF7o%3D&access_key_id=CSOLEWFQKFZRHHQLBXES "My QR")
+- wechat: https://jpbimages.sh1a.qingstor.com/wechatQR.jpeg?expires=1492848801&signature=DTI2HkBSMbttkA2ip%2FbcEKEzysptTNXcX8EIPswBF7o%3D&access_key_id=CSOLEWFQKFZRHHQLBXES
