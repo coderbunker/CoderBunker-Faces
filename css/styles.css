@@ -1,0 +1,34 @@
+/*mobile*/
+.face-thumb {
+  height: 250px;
+  width: 250px;
+}
+
+.pic-box{
+  margin-left:7%;
+}
+
+
+/*tablet*/
+@media (min-width: 600px){
+  .face-thumb {
+    height: 250px;
+    width: 250px;
+  }
+
+  .pic-box{
+    margin-left:12%;
+  }
+}
+
+/*desktop*/
+@media (min-width: 768px) {
+  .face-thumb {
+    height: 200px;
+    width: 200px;
+  }
+
+  .pic-box{
+    margin-left: 7%;
+  }
+}
