@@ -1,5 +1,5 @@
 /*mobile*/
-.face-pic {
+.face-thumb {
   height: 250px;
   width: 250px;
 }
@@ -11,7 +11,7 @@
 
 /*tablet*/
 @media (min-width: 600px){
-  .face-pic {
+  .face-thumb {
     height: 250px;
     width: 250px;
   }
@@ -23,7 +23,7 @@
 
 /*desktop*/
 @media (min-width: 768px) {
-  .face-pic {
+  .face-thumb {
     height: 200px;
     width: 200px;
   }
