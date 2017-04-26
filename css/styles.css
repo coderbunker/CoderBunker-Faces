@@ -6,9 +6,9 @@
   margin-left:1%;
 }
 
-@media only screen and (max-width : 320px) {
+@media only screen and (max-width : 375px) {
   #pic-box{
-    margin-left: 3%;
+    margin-left: 10%;
   }
   .face-thumb{
     width: 150px;
