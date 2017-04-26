@@ -1,4 +1,4 @@
-.face-thumb {
+/*.face-thumb {
   width: 200px;
   height: 200px;
 }
@@ -13,5 +13,25 @@
   .face-thumb{
     width: 150px;
     height: 150px;
+  }
+}*/
+
+/* phone */
+#pic-box{
+  margin-left: 2%;
+}
+.face-thumb{
+  width: 179px;
+  height: 179px;
+}
+
+/* desktop */
+@media only screen and (min-width : 1224px) {
+  #pic-box{
+    margin-left: 2%;
+  }
+  .face-thumb{
+    width: 200px;
+    height: 200px;
   }
 }
