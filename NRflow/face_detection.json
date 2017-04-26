@@ -1,0 +1,353 @@
+[
+    {
+        "id": "832a1cdd.af9fd",
+        "type": "exec",
+        "z": "e280990.796f768",
+        "command": "raspistill -q 15 -o /home/pi/.node-red/photos/photo.jpg",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "",
+        "timer": "10",
+        "name": "Save snapshot from raspicam to node-red directory",
+        "x": 421.7142639160156,
+        "y": 108.00000190734863,
+        "wires": [
+            [
+                "243f5927.802846"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "2e74b698.adb24a",
+        "type": "throttle",
+        "z": "e280990.796f768",
+        "name": "limit sensitivity",
+        "throttleType": "count",
+        "timeLimit": 0,
+        "timeLimitType": "seconds",
+        "countLimit": "50",
+        "blockSize": 0,
+        "locked": false,
+        "x": 271.5166778564453,
+        "y": 50,
+        "wires": [
+            [
+                "832a1cdd.af9fd"
+            ]
+        ]
+    },
+    {
+        "id": "c4971351.27ba5",
+        "type": "rpi-gpio in",
+        "z": "e280990.796f768",
+        "name": "IR Sensor",
+        "pin": "7",
+        "intype": "tri",
+        "debounce": "25",
+        "read": false,
+        "x": 67.51667785644531,
+        "y": 112,
+        "wires": [
+            [
+                "2e74b698.adb24a"
+            ]
+        ]
+    },
+    {
+        "id": "243f5927.802846",
+        "type": "file in",
+        "z": "e280990.796f768",
+        "name": "Snapshot obtained from IP-Camera in \"~/.node-red\" directory",
+        "filename": "/home/pi/.node-red/photos/photo.jpg",
+        "format": "",
+        "x": 885,
+        "y": 52,
+        "wires": [
+            [
+                "c10a82ca.8deba"
+            ]
+        ]
+    },
+    {
+        "id": "c10a82ca.8deba",
+        "type": "switch",
+        "z": "e280990.796f768",
+        "name": "Is this a valid photo (checks if photo array is null)",
+        "property": "payload[0]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 278.25,
+        "y": 233.50000381469727,
+        "wires": [
+            [
+                "34dce441.58ee3c"
+            ],
+            [
+                "fc22e488.6dd8f8"
+            ]
+        ]
+    },
+    {
+        "id": "34dce441.58ee3c",
+        "type": "template",
+        "z": "e280990.796f768",
+        "name": "Camera not working",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "Camera went dark, check that it's connected and enabled.",
+        "x": 608,
+        "y": 184,
+        "wires": [
+            [
+                "2356106c.64923"
+            ]
+        ]
+    },
+    {
+        "id": "fc22e488.6dd8f8",
+        "type": "visual-recognition-v3",
+        "z": "e280990.796f768",
+        "name": "make call to Watson",
+        "apikey": "e401b124c3fda52b0842644c01097c7e172048f8",
+        "image-feature": "detectFaces",
+        "lang": "en",
+        "x": 210.5,
+        "y": 340,
+        "wires": [
+            [
+                "e6c5007a.d02b5"
+            ]
+        ]
+    },
+    {
+        "id": "e6c5007a.d02b5",
+        "type": "switch",
+        "z": "e280990.796f768",
+        "name": "",
+        "property": "result.images[0].faces.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 457.25,
+        "y": 322.75,
+        "wires": [
+            [
+                "a8ec9e32.817b2"
+            ],
+            [
+                "31dfed49.b35c52",
+                "f01e09f4.3284b8"
+            ]
+        ]
+    },
+    {
+        "id": "31dfed49.b35c52",
+        "type": "function",
+        "z": "e280990.796f768",
+        "name": "make files for each face, put info in array, send as JSON",
+        "func": "// convert photo.jpg -crop 1026x848+999+377 crop-text.jpg\nvar face_obj = [];\nvar exec = global.get('nodeCmd');\nvar idGen = global.get('shortID');\nvar jsonInfo;\nvar extract;\nvar upload;\nvar height;\nvar left;\nvar above;\nvar width;\n\nfor (var i = 0; i < msg.result.images[0].faces.length; i++){\n    // Makes extra image of the detected faces\n    faceID = idGen.generate();\n    height = msg.result.images[0].faces[i].face_location.height;\n    left = msg.result.images[0].faces[i].face_location.left;\n    above = msg.result.images[0].faces[i].face_location.top;\n    width = msg.result.images[0].faces[i].face_location.width;\n    \n    face_obj.push(msg.result.images[0].faces[i]);\n    face_obj.id = faceID;\n    \n    // Run command to extract face\n    extract = \"cd /home/pi/.node-red/photos && convert photo.jpg -crop \" + height + \"x\" + width + \"+\" + left + \"+\" + above + \" /home/pi/.node-red/photos/\" + faceID + \".jpg\";\n    exec.run(extract);\n    \n    // JSON with additional info\n    jsonInfo = JSON.stringify(msg.result.images[0].faces[i]);\n    jsonInfo = 'cd /home/pi/.node-red/json && echo \"' + jsonInfo + '\" ' + '> ' + faceID + '.json';\n    exec.run(jsonInfo);\n    // upload = 'curl -X POST \"http://coderbunker-face-detection.sh1a.qingstor.com\" -F \"key=' + faceID + '.json\" -F \"file=@' + faceID + '.json\" -H \"Content-Type:multipart/form-data\"';\n}\n\n\nreturn [face_obj];",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 619.75,
+        "y": 441,
+        "wires": [
+            [
+                "309b1db1.e13e22"
+            ]
+        ]
+    },
+    {
+        "id": "2356106c.64923",
+        "type": "e-mail",
+        "z": "e280990.796f768",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "secure": true,
+        "name": "jpbeltrami@gmail.com",
+        "dname": "sends user an email alert",
+        "x": 1172.375,
+        "y": 277.25,
+        "wires": []
+    },
+    {
+        "id": "309b1db1.e13e22",
+        "type": "debug",
+        "z": "e280990.796f768",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "true",
+        "x": 1036.000015258789,
+        "y": 355.2500057220459,
+        "wires": []
+    },
+    {
+        "id": "30efcca4.f22d64",
+        "type": "watch",
+        "z": "e280990.796f768",
+        "name": "listens for file changes in photos folder",
+        "files": "/home/pi/.node-red/photos",
+        "x": 398,
+        "y": 501,
+        "wires": [
+            [
+                "5af50067.a56d"
+            ]
+        ]
+    },
+    {
+        "id": "5af50067.a56d",
+        "type": "function",
+        "z": "e280990.796f768",
+        "name": "sends cropped photo to qingstor via cURL",
+        "func": "var exec = global.get('nodeCmd');\nvar existing_photos = [];\n\nif(msg.file == \"photo.jpg~\"){\n    msg.payload = \"photo not sent: \" + msg.file;\n    return msg;\n}\n\nelse{\nvar upload = 'cd /home/pi/.node-red/photos && curl -X POST \"http://coderbunker-face-detection.sh1a.qingstor.com\" -F \"key=' + msg.file + '\" -F \"file=@/home/pi/.node-red/photos/' + msg.file + '\" -H \"Content-Type:multipart/form-data\"';\n    exec.get(upload, function(data, err){\n        if(!err){\n            node.log(data);\n        }\n        else{\n            node.log(err);\n        }\n    });\n    msg.payload = \"photo sent: \" + msg.file;\n}\n    \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 793.7500152587891,
+        "y": 514.5000085830688,
+        "wires": [
+            [
+                "b4f6d992.bb4b48"
+            ]
+        ]
+    },
+    {
+        "id": "b4f6d992.bb4b48",
+        "type": "debug",
+        "z": "e280990.796f768",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 1094.000015258789,
+        "y": 554.2500076293945,
+        "wires": []
+    },
+    {
+        "id": "f01e09f4.3284b8",
+        "type": "file in",
+        "z": "e280990.796f768",
+        "name": "get the photo",
+        "filename": "/home/pi/.node-red/photos/photo.jpg",
+        "format": "",
+        "x": 637,
+        "y": 368,
+        "wires": [
+            [
+                "77e68926.49ea18"
+            ]
+        ]
+    },
+    {
+        "id": "77e68926.49ea18",
+        "type": "function",
+        "z": "e280990.796f768",
+        "name": "Faces Detected",
+        "func": "msg.topic=\"Faces detected\";\nmsg.filename=new Date().toISOString().replace(/T/, ' ').replace(/\\..+/, '')+\".jpg\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 831,
+        "y": 369,
+        "wires": [
+            [
+                "2356106c.64923"
+            ]
+        ]
+    },
+    {
+        "id": "a8ec9e32.817b2",
+        "type": "file in",
+        "z": "e280990.796f768",
+        "name": "get the photo",
+        "filename": "/home/pi/.node-red/photos/photo.jpg",
+        "format": "",
+        "x": 633,
+        "y": 290,
+        "wires": [
+            [
+                "e63e7b8f.cdd3c8"
+            ]
+        ]
+    },
+    {
+        "id": "e63e7b8f.cdd3c8",
+        "type": "function",
+        "z": "e280990.796f768",
+        "name": "Activity Detected",
+        "func": "msg.topic=\"Activity Detected\";\nmsg.filename=new Date().toISOString().replace(/T/, ' ').replace(/\\..+/, '')+\".jpg\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 840,
+        "y": 287,
+        "wires": [
+            [
+                "2356106c.64923"
+            ]
+        ]
+    },
+    {
+        "id": "52f799e0.8dd6e8",
+        "type": "watch",
+        "z": "e280990.796f768",
+        "name": "listens for file changes in json folder",
+        "files": "/home/pi/.node-red/json",
+        "x": 398.75,
+        "y": 577.5,
+        "wires": [
+            [
+                "1e38dd55.f45463"
+            ]
+        ]
+    },
+    {
+        "id": "1e38dd55.f45463",
+        "type": "function",
+        "z": "e280990.796f768",
+        "name": "send the json to qingstor",
+        "func": "var exec = global.get('nodeCmd');\n\nvar upload = 'cd /home/pi/.node-red/json && curl -X POST \"http://coderbunker-face-detection.sh1a.qingstor.com\" -F \"key=' + msg.file + '\" -F \"file=@/home/pi/.node-red/json/' + msg.file + '\" -H \"Content-Type:multipart/form-data\"';\n    exec.get(upload, function(data, err){\n        if(!err){\n            node.log(data);\n        }\n        else{\n            node.log(err);\n        }\n    });\n    msg.payload = \"JSON sent: \" + msg.file;\n    \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 765,
+        "y": 587.5,
+        "wires": [
+            [
+                "5ffee4c0.4063ac"
+            ]
+        ]
+    },
+    {
+        "id": "5ffee4c0.4063ac",
+        "type": "debug",
+        "z": "e280990.796f768",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 997.5,
+        "y": 635,
+        "wires": []
+    }
+]
