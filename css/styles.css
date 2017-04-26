@@ -2,3 +2,16 @@
   width: 200px;
   height: 200px;
 }
+#pic-box{
+  margin-left:1%;
+}
+
+@media only screen and (max-width : 320px) {
+  #pic-box{
+    margin-left: 3%;
+  }
+  .face-thumb{
+    width: 150px;
+    height: 150px;
+  }
+}
