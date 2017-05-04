@@ -1,20 +1,3 @@
-/*.face-thumb {
-  width: 200px;
-  height: 200px;
-}
-#pic-box{
-  margin-left:1%;
-}
-
-@media only screen and (max-width : 375px) {
-  #pic-box{
-    margin-left: 10%;
-  }
-  .face-thumb{
-    width: 150px;
-    height: 150px;
-  }
-}*/
 
 /* phone */
 #pic-box{
