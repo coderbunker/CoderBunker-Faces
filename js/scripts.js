@@ -1,8 +1,8 @@
 $(document).ready(function() {
   var nextMarker;
   // this gets the amount of objects in cloud
-  var faceQttyPromise = $.getJSON('https://cbfaces.sh1a.qingstor.com?stats');
-  var firstPromise = $.getJSON('https://cbfaces.sh1a.qingstor.com?limit=1000');
+  var faceQttyPromise = $.getJSON('https://sh1a.qingstor.com/cbfaces/?stats');
+  var firstPromise = $.getJSON('https://sh1a.qingstor.com/cbfaces/?limit=1000');
   var nextPromise;
   var batchQtty;
   var count;
@@ -17,7 +17,7 @@ $(document).ready(function() {
     count = statusData[2].responseJSON.count;
     count = (count - batchQtty).toString();
     keys = keys.concat(firstBatch[2].responseJSON.keys);
-    nextPromise = $.getJSON('https://cbfaces.sh1a.qingstor.com?limit=' + count + '&marker=' + nextMarker);
+    nextPromise = $.getJSON('https://sh1a.qingstor.com/cbfaces/?limit=' + count + '&marker=' + nextMarker);
 
     $.when(nextPromise).then(function(nextBatch){
       keys = keys.concat(nextBatch.keys);
