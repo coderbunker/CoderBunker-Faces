@@ -1,6 +1,5 @@
 $(document).ready(function() {
   var nextMarker;
-  // this gets the amount of objects in cloud
   var faceQttyPromise = $.getJSON('https://sh1a.qingstor.com/cbfaces/?stats');
   var firstPromise = $.getJSON('https://sh1a.qingstor.com/cbfaces/?limit=1000');
   var nextPromise;
@@ -12,21 +11,26 @@ $(document).ready(function() {
 
   // makes the first request without marker
   $.when(firstPromise, faceQttyPromise).then(function(firstBatch, statusData){
+    // gets the number of images in the DB. Then requests the max number of images it can.
     nextMarker = firstBatch[2].responseJSON.next_marker;
     batchQtty = firstBatch[2].responseJSON.keys.length;
     count = statusData[2].responseJSON.count;
     count = (count - batchQtty).toString();
     keys = keys.concat(firstBatch[2].responseJSON.keys);
-    nextPromise = $.getJSON('https://sh1a.qingstor.com/cbfaces/?limit=' + count + '&marker=' + nextMarker);
+    nextPromise = $.getJSON('https://sh1a.qingstor.com/cbfaces/?limit=1000&marker=' + nextMarker);
+
+    // THIS NEEDS TO BE AUTOMATED
 
     $.when(nextPromise).then(function(nextBatch){
+      // orders images chronologically
       keys = keys.concat(nextBatch.keys);
       keys = keys.sort(function(a,b){
         return new Date(b.created).getTime() - new Date(a.created).getTime();
       });
+    // THIS NEEDS TO BE AUTOMATED
 
       console.log(keys.length);
-
+      // loops through json objects adding the images to the page.
       for (var i = 0; i < keys.length; i++){
         name = keys[i].key.split(".")
         if(name[1] == "jpg"){
@@ -38,7 +42,3 @@ $(document).ready(function() {
     }); // $.when(nextPromise)
   }); // $.when(firstPromise)
 }); // $(document).ready
-
-function callAPI(marker, quantity){
-
-}
