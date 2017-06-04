@@ -36,9 +36,12 @@ $(document).ready(function() {
         if(name[1] == "jpg"){
           face = '<img src="https://sh1a.qingstor.com/cbfaces/' + keys[i].key + '" alt="face" class="face-thumb float-left img-thumbnail"/>';
           $("#pic-box").append(face);
-          // console.log(keys[i]);
-        };
-      }
+        }; // if(name[1] == "jpg")
+      } // for (var i = 0; i < keys.length; i++)
+
+      $("img").on("error", function(){
+        $(this).hide();
+      }); // $("img").error
     }); // $.when(nextPromise)
   }); // $.when(firstPromise)
 }); // $(document).ready
