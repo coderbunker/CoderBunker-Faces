@@ -1,7 +1,7 @@
 # CoderBunker-Faces
 
 ## Intro
-Hi! This is CoderBunker's first face detection system! 
+Welcome to CoderBunker's first face detection system! 
 The Rasberry Pi has a camera that will take a picture when someone walks in front of the coffee machine.  
 Each picture is sent to the IBM Watson Visual Recognition API that will detect any faces in the picture.
 Each face is cropped and saved into a file and saved into a database. 
